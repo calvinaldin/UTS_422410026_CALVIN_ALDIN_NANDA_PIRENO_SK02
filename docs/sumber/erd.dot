@@ -1,0 +1,72 @@
+digraph ERD {
+  graph [rankdir=LR, fontname="DejaVu Sans", labelloc=t, fontsize=22, nodesep=0.8, ranksep=1.3, pad=0.4, bgcolor="white",
+         label="ERD - Observatorium Langit Gelap (SK02)\nLaravel 12 + MySQL"];
+  node  [shape=plain, fontname="DejaVu Sans", fontsize=12];
+  edge  [fontname="DejaVu Sans", fontsize=11, color="#34568b", penwidth=1.6, dir=both];
+
+  kategori [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#121c36">
+      <TR><TD BGCOLOR="#121c36" COLSPAN="2"><FONT COLOR="white"><B>kategori</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B>  id</TD><TD ALIGN="LEFT" PORT="id">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT">nama</TD><TD ALIGN="LEFT">VARCHAR(100) <I>UNIQUE</I></TD></TR>
+      <TR><TD ALIGN="LEFT">deskripsi</TD><TD ALIGN="LEFT">TEXT NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">timestamps</TD><TD ALIGN="LEFT">created_at, updated_at</TD></TR>
+    </TABLE>>];
+
+  sesi [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#121c36">
+      <TR><TD BGCOLOR="#d42f4b" COLSPAN="2"><FONT COLOR="white"><B>sesi_pengamatan</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B>  id</TD><TD ALIGN="LEFT" PORT="id">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT">kode_sesi</TD><TD ALIGN="LEFT">VARCHAR(20) <I>UNIQUE</I></TD></TR>
+      <TR><TD ALIGN="LEFT">nama_sesi</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT">objek_sasaran</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="kat"><B>FK</B>  kategori_id</TD><TD ALIGN="LEFT">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT">tanggal_pengamatan</TD><TD ALIGN="LEFT">DATE</TD></TR>
+      <TR><TD ALIGN="LEFT">waktu_mulai</TD><TD ALIGN="LEFT">TIME NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">waktu_selesai</TD><TD ALIGN="LEFT">TIME NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">status</TD><TD ALIGN="LEFT">ENUM(direncanakan, berlangsung,<BR ALIGN="LEFT"/>selesai, dibatalkan)</TD></TR>
+      <TR><TD ALIGN="LEFT">catatan</TD><TD ALIGN="LEFT">TEXT NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">timestamps</TD><TD ALIGN="LEFT">created_at, updated_at</TD></TR>
+    </TABLE>>];
+
+  lokasi [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#121c36">
+      <TR><TD BGCOLOR="#121c36" COLSPAN="2"><FONT COLOR="white"><B>detail_lokasi</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B>  id</TD><TD ALIGN="LEFT" PORT="id">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="sesi"><B>FK</B>  sesi_pengamatan_id</TD><TD ALIGN="LEFT">BIGINT UNSIGNED <I>UNIQUE</I></TD></TR>
+      <TR><TD ALIGN="LEFT">nama_lokasi</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT">lintang</TD><TD ALIGN="LEFT">DECIMAL(10,7)</TD></TR>
+      <TR><TD ALIGN="LEFT">bujur</TD><TD ALIGN="LEFT">DECIMAL(10,7)</TD></TR>
+      <TR><TD ALIGN="LEFT">ketinggian</TD><TD ALIGN="LEFT">INT UNSIGNED NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">catatan_cuaca</TD><TD ALIGN="LEFT">TEXT NULL</TD></TR>
+      <TR><TD ALIGN="LEFT">timestamps</TD><TD ALIGN="LEFT">created_at, updated_at</TD></TR>
+    </TABLE>>];
+
+  pivot [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#121c36">
+      <TR><TD BGCOLOR="#34568b" COLSPAN="2"><FONT COLOR="white"><B>perlengkapan_sesi</B> (pivot)</FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B>  id</TD><TD ALIGN="LEFT">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="sesi"><B>FK</B>  sesi_pengamatan_id</TD><TD ALIGN="LEFT">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT" PORT="alat"><B>FK</B>  perlengkapan_id</TD><TD ALIGN="LEFT">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT">jumlah</TD><TD ALIGN="LEFT">SMALLINT UNSIGNED = 1</TD></TR>
+      <TR><TD ALIGN="LEFT">timestamps</TD><TD ALIGN="LEFT">created_at, updated_at</TD></TR>
+      <TR><TD ALIGN="LEFT" COLSPAN="2"><I>UNIQUE (sesi_pengamatan_id, perlengkapan_id)</I></TD></TR>
+    </TABLE>>];
+
+  alat [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" COLOR="#121c36">
+      <TR><TD BGCOLOR="#121c36" COLSPAN="2"><FONT COLOR="white"><B>perlengkapan</B></FONT></TD></TR>
+      <TR><TD ALIGN="LEFT"><B>PK</B>  id</TD><TD ALIGN="LEFT" PORT="id">BIGINT UNSIGNED</TD></TR>
+      <TR><TD ALIGN="LEFT">kode</TD><TD ALIGN="LEFT">VARCHAR(20) <I>UNIQUE</I></TD></TR>
+      <TR><TD ALIGN="LEFT">nama</TD><TD ALIGN="LEFT">VARCHAR(255)</TD></TR>
+      <TR><TD ALIGN="LEFT">jenis</TD><TD ALIGN="LEFT">ENUM(teleskop, kamera, filter,<BR ALIGN="LEFT"/>tripod, lainnya)</TD></TR>
+      <TR><TD ALIGN="LEFT">kondisi</TD><TD ALIGN="LEFT">ENUM(baik, perlu_kalibrasi, rusak)</TD></TR>
+      <TR><TD ALIGN="LEFT">timestamps</TD><TD ALIGN="LEFT">created_at, updated_at</TD></TR>
+    </TABLE>>];
+
+  // kardinalitas (notasi crow's foot)
+  kategori:id:e -> sesi:kat:w   [arrowtail=teetee, arrowhead=crowodot, label="  1 : 0..N\n  mengelompokkan  ", headlabel="", taillabel=""];
+  sesi:id:e     -> lokasi:sesi:w [arrowtail=teetee, arrowhead=teetee,   label="  1 : 1 (One-to-One)\n  memiliki  ", color="#d42f4b"];
+  sesi:id:e     -> pivot:sesi:w  [arrowtail=teetee, arrowhead=crowodot, label="  1 : 0..N  "];
+  alat:id:e     -> pivot:alat:w  [arrowtail=teetee, arrowhead=crowodot, label="  1 : 0..N  "];
+}

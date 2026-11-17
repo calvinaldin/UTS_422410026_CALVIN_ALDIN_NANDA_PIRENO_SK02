@@ -1,0 +1,133 @@
+digraph CLASS {
+  graph [rankdir=TB, fontname="DejaVu Sans", labelloc=t, fontsize=22, nodesep=0.45, ranksep=0.9, pad=0.4, bgcolor="white", splines=true,
+         label="Class Diagram - Observatorium Langit Gelap (SK02)\nArsitektur: Controller -> Service -> Model (Eloquent), validasi via Form Request"];
+  node  [shape=plain, fontname="DejaVu Sans", fontsize=11];
+  edge  [fontname="DejaVu Sans", fontsize=10, color="#34568b"];
+
+  // ===== MODEL =====
+  Kategori [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#121c36">
+   <TR><TD BGCOLOR="#121c36"><FONT COLOR="white"><B>Kategori</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">- id : bigint<BR/>- nama : string<BR/>- deskripsi : text</TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ sesiPengamatan() : HasMany<BR/>+ scopeFilter(filters)</TD></TR>
+  </TABLE>>];
+
+  SesiPengamatan [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#121c36">
+   <TR><TD BGCOLOR="#d42f4b"><FONT COLOR="white"><B>SesiPengamatan</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">- id : bigint<BR/>- kode_sesi : string<BR/>- nama_sesi : string<BR/>- objek_sasaran : string<BR/>- kategori_id : bigint (FK)<BR/>- tanggal_pengamatan : date<BR/>- waktu_mulai : time<BR/>- waktu_selesai : time<BR/>- status : enum<BR/>- catatan : text</TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ kategori() : BelongsTo<BR/>+ detailLokasi() : HasOne<BR/>+ perlengkapan() : BelongsToMany<BR/>+ scopeFilter(filters)<BR/>+ getStatusLabelAttribute()</TD></TR>
+  </TABLE>>];
+
+  DetailLokasi [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#121c36">
+   <TR><TD BGCOLOR="#121c36"><FONT COLOR="white"><B>DetailLokasi</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">- id : bigint<BR/>- sesi_pengamatan_id : bigint (FK, unique)<BR/>- nama_lokasi : string<BR/>- lintang : decimal<BR/>- bujur : decimal<BR/>- ketinggian : int<BR/>- catatan_cuaca : text</TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ sesiPengamatan() : BelongsTo<BR/>+ getKoordinatAttribute()<BR/>+ scopeFilter(filters)</TD></TR>
+  </TABLE>>];
+
+  Perlengkapan [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#121c36">
+   <TR><TD BGCOLOR="#121c36"><FONT COLOR="white"><B>Perlengkapan</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">- id : bigint<BR/>- kode : string<BR/>- nama : string<BR/>- jenis : enum<BR/>- kondisi : enum</TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ sesiPengamatan() : BelongsToMany<BR/>+ scopeFilter(filters)<BR/>+ getJenisLabelAttribute()<BR/>+ getKondisiLabelAttribute()</TD></TR>
+  </TABLE>>];
+
+  // ===== SERVICE =====
+  SesiService [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#34568b">
+   <TR><TD BGCOLOR="#34568b"><FONT COLOR="white"><B>SesiPengamatanService</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ paginate(filters, perPage)<BR/>+ store(data) : SesiPengamatan  &lt;&lt;DB::transaction&gt;&gt;<BR/>+ update(sesi, data)  &lt;&lt;DB::transaction&gt;&gt;<BR/>+ delete(sesi)  &lt;&lt;DB::transaction&gt;&gt;</TD></TR>
+  </TABLE>>];
+  LokasiService [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#34568b">
+   <TR><TD BGCOLOR="#34568b"><FONT COLOR="white"><B>LokasiService</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ paginate / store / update / delete<BR/>&lt;&lt;DB::transaction&gt;&gt;</TD></TR>
+  </TABLE>>];
+  PerlengkapanService [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#34568b">
+   <TR><TD BGCOLOR="#34568b"><FONT COLOR="white"><B>PerlengkapanService</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ paginate / store / update / delete<BR/>&lt;&lt;DB::transaction&gt;&gt;</TD></TR>
+  </TABLE>>];
+  KategoriService [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#34568b">
+   <TR><TD BGCOLOR="#34568b"><FONT COLOR="white"><B>KategoriService</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ paginate / store / update / delete<BR/>&lt;&lt;DB::transaction&gt;&gt;</TD></TR>
+  </TABLE>>];
+  DashboardService [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#34568b">
+   <TR><TD BGCOLOR="#34568b"><FONT COLOR="white"><B>DashboardService</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ ringkasan() : array</TD></TR>
+  </TABLE>>];
+
+  // ===== CONTROLLER =====
+  SesiController [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#23785a">
+   <TR><TD BGCOLOR="#23785a"><FONT COLOR="white"><B>SesiPengamatanController</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ index / create / store / show<BR/>+ edit / update / destroy</TD></TR>
+  </TABLE>>];
+  LokasiController [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#23785a">
+   <TR><TD BGCOLOR="#23785a"><FONT COLOR="white"><B>LokasiController</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ index / create / store / show<BR/>+ edit / update / destroy</TD></TR>
+  </TABLE>>];
+  PerlengkapanController [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#23785a">
+   <TR><TD BGCOLOR="#23785a"><FONT COLOR="white"><B>PerlengkapanController</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ index / create / store<BR/>+ edit / update / destroy</TD></TR>
+  </TABLE>>];
+  KategoriController [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#23785a">
+   <TR><TD BGCOLOR="#23785a"><FONT COLOR="white"><B>KategoriController</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ index / create / store<BR/>+ edit / update / destroy</TD></TR>
+  </TABLE>>];
+  DashboardController [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#23785a">
+   <TR><TD BGCOLOR="#23785a"><FONT COLOR="white"><B>DashboardController</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ __invoke()</TD></TR>
+  </TABLE>>];
+
+  // ===== FORM REQUEST =====
+  SesiReq [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#b7791f">
+   <TR><TD BGCOLOR="#b7791f"><FONT COLOR="white"><B>SesiPengamatanRequest</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ rules() : array<BR/>+ attributes() : array</TD></TR>
+  </TABLE>>];
+  LokasiReq [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#b7791f">
+   <TR><TD BGCOLOR="#b7791f"><FONT COLOR="white"><B>LokasiRequest</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ rules() / messages()</TD></TR>
+  </TABLE>>];
+  PerlengkapanReq [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#b7791f">
+   <TR><TD BGCOLOR="#b7791f"><FONT COLOR="white"><B>PerlengkapanRequest</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ rules() : array</TD></TR>
+  </TABLE>>];
+  KategoriReq [label=<
+  <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3" COLOR="#b7791f">
+   <TR><TD BGCOLOR="#b7791f"><FONT COLOR="white"><B>KategoriRequest</B></FONT></TD></TR>
+   <TR><TD ALIGN="LEFT" BALIGN="LEFT">+ rules() : array</TD></TR>
+  </TABLE>>];
+
+  // ----- hubungan antar model (asosiasi) -----
+  Kategori -> SesiPengamatan [dir=both, arrowtail=odiamond, arrowhead=none, taillabel="1", headlabel="0..*", label=" hasMany / belongsTo "];
+  SesiPengamatan -> DetailLokasi [dir=both, arrowtail=diamond, arrowhead=none, taillabel="1", headlabel="1", label=" hasOne / belongsTo ", color="#d42f4b", penwidth=2];
+  SesiPengamatan -> Perlengkapan [dir=both, arrowtail=none, arrowhead=none, taillabel="0..*", headlabel="0..*", label=" belongsToMany\n (pivot: perlengkapan_sesi.jumlah) ", penwidth=2];
+
+  // ----- service memakai model (dependensi) -----
+  edge [style=dashed, arrowhead=vee, color="#555555", label=""];
+  SesiService -> SesiPengamatan; SesiService -> DetailLokasi; SesiService -> Perlengkapan;
+  LokasiService -> DetailLokasi; PerlengkapanService -> Perlengkapan; KategoriService -> Kategori;
+  DashboardService -> SesiPengamatan;
+
+  // ----- controller memanggil service & request -----
+  SesiController -> SesiService; LokasiController -> LokasiService; PerlengkapanController -> PerlengkapanService;
+  KategoriController -> KategoriService; DashboardController -> DashboardService;
+  edge [color="#b7791f"];
+  SesiController -> SesiReq; LokasiController -> LokasiReq; PerlengkapanController -> PerlengkapanReq; KategoriController -> KategoriReq;
+
+  { rank=same; SesiController; LokasiController; PerlengkapanController; KategoriController; DashboardController; }
+  { rank=same; SesiReq; LokasiReq; PerlengkapanReq; KategoriReq; }
+  { rank=same; SesiService; LokasiService; PerlengkapanService; KategoriService; DashboardService; }
+  { rank=same; Kategori; SesiPengamatan; DetailLokasi; Perlengkapan; }
+}
